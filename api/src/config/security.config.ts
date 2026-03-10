@@ -11,4 +11,7 @@ export default () => ({
             throw new Error('MONGO_URI is not defined');
         })()
     },
+    catalog: {
+        baseUrl: process.env.CATALOG_API_URL || 'https://dummyjson.com'
+    }
 });

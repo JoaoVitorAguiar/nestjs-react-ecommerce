@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import securityConfig from './config/security.config'
 import { MongooseModule } from '@nestjs/mongoose';
+import { CatalogModule } from './catalog/catalog.module';
 
 
 @Module({
@@ -20,7 +21,8 @@ import { MongooseModule } from '@nestjs/mongoose';
         uri: config.get<string>('database.uri')!
       })
     }),
-    AuthModule],
+    AuthModule,
+    CatalogModule],
   controllers: [AppController],
   providers: [AppService],
 })
