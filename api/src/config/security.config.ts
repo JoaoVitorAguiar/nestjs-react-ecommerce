@@ -13,5 +13,11 @@ export default () => ({
     },
     catalog: {
         baseUrl: process.env.CATALOG_API_URL || 'https://dummyjson.com'
+    },
+
+    cors: {
+        origins: process.env.CORS_ORIGINS?.split(",") ?? [
+            "http://localhost:5173"
+        ]
     }
 });
