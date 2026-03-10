@@ -6,14 +6,14 @@ import { Model } from 'mongoose';
 import { SignInDto } from './dto/sign-in.dto';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
-
-const SALT_ROUNDS = 10;
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
-    private jwtService: JwtService
+    private jwtService: JwtService,
+    private configService: ConfigService
   ) { }
 
   async signUp(dto: SignUpDto) {
@@ -67,7 +67,8 @@ export class AuthService {
 
 
   private async hash(password: string): Promise<string> {
-    return bcrypt.hash(password, SALT_ROUNDS);
+    const rounds = this.configService.get<number>('bcrypt.rounds')!;
+    return bcrypt.hash(password, rounds);
   }
 
   private async verify(password: string, hash: string): Promise<boolean> {
