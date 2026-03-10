@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import securityConfig from './config/security.config'
 import { MongooseModule } from '@nestjs/mongoose';
 import { CatalogModule } from './catalog/catalog.module';
+import { CartModule } from './cart/cart.module';
 
 
 @Module({
@@ -22,7 +23,8 @@ import { CatalogModule } from './catalog/catalog.module';
       })
     }),
     AuthModule,
-    CatalogModule],
+    CatalogModule,
+    CartModule],
   controllers: [AppController],
   providers: [AppService],
 })
