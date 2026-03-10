@@ -7,6 +7,8 @@ export default () => ({
         rounds: parseInt(process.env.BCRYPT_ROUNDS || '10')
     },
     database: {
-        uri: process.env.MONGO_URI || 'mongodb://root:root@localhost:27017/billify?authSource=admin'
+        uri: process.env.MONGO_URI ?? (() => {
+            throw new Error('MONGO_URI is not defined');
+        })()
     },
 });
