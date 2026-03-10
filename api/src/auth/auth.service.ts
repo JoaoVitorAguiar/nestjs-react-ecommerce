@@ -1,26 +1,76 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+import { SignUpDto } from './dto/sign-up.dto';
+import { User, UserDocument } from './entities/user.entity';
+import { Model } from 'mongoose';
+import { SignInDto } from './dto/sign-in.dto';
+import { JwtService } from '@nestjs/jwt';
+import { InjectModel } from '@nestjs/mongoose';
+
+const SALT_ROUNDS = 10;
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private jwtService: JwtService
+  ) { }
+
+  async signUp(dto: SignUpDto) {
+
+    const userExists = await this.userModel.findOne({ email: dto.email });
+
+    if (userExists) {
+      throw new ConflictException('Email already registered');
+    }
+
+    const passwordHash = await this.hash(dto.password);
+
+    const user = new this.userModel({
+      name: dto.name,
+      email: dto.email,
+      passwordHash
+    });
+
+    await user.save();
+
+    return {
+      message: 'User created successfully'
+    };
   }
 
-  findAll() {
-    return `This action returns all auth`;
+  async signIn(dto: SignInDto) {
+
+    const user = await this.userModel.findOne({ email: dto.email });
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const isValid = await this.verify(dto.password, user.passwordHash);
+
+    if (!isValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const payload = {
+      sub: user._id,
+      role: user.role
+    };
+
+    const accessToken = await this.jwtService.signAsync(payload);
+
+    return {
+      access_token: accessToken
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
+
+  private async hash(password: string): Promise<string> {
+    return bcrypt.hash(password, SALT_ROUNDS);
   }
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+  private async verify(password: string, hash: string): Promise<boolean> {
+    return bcrypt.compare(password, hash);
   }
 }

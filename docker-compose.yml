@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+
+  mongodb:
+    image: mongo:7
+    container_name: billify-mongo
+
+    restart: always
+
+    ports:
+      - "27017:27017"
+
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+
+    volumes:
+      - billify_mongo_data:/data/db
+
+volumes:
+  billify_mongo_data:
