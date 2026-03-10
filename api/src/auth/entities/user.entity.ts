@@ -3,8 +3,6 @@ import { Document } from 'mongoose'
 
 export type UserDocument = User & Document;
 
-export type UserRole = 'admin' | 'customer';
-
 @Schema()
 export class User {
     @Prop()
@@ -15,9 +13,6 @@ export class User {
 
     @Prop()
     passwordHash: string;
-
-    @Prop({ default: 'customer' })
-    role: UserRole;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

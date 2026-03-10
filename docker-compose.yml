@@ -4,7 +4,7 @@ services:
 
   mongodb:
     image: mongo:7
-    container_name: billify-mongo
+    container_name: ecommerce-mongo
 
     restart: always
 
@@ -16,7 +16,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: root
 
     volumes:
-      - billify_mongo_data:/data/db
+      - ecommerce_mongo_data:/data/db
 
 volumes:
-  billify_mongo_data:
+  ecommerce_mongo_data:
