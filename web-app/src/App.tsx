@@ -8,37 +8,40 @@ import Register from "@/pages/RegisterPage"
 import CartPage from "@/pages/CartPage"
 import { CartProvider } from "./context/CartContext"
 import { AuthProvider } from "./context/AuthContext"
-import NotFound from "./pages/NotFound"
+import NotFound from "./errors/NotFound"
+import { ErrorBoundary } from "./errors/ErrorBoundary"
 
 
 export default function App() {
   return (
     <BrowserRouter>
+      <ErrorBoundary>
 
-      <AuthProvider>
+        <AuthProvider>
 
-        <Routes>
+          <Routes>
 
-          <Route
-            element={
-              <CartProvider>
-                <Layout />
-              </CartProvider>
-            }
-          >
-            <Route path="/" element={<Catalog />} />
-            <Route path="/cart" element={<CartPage />} />
-            <Route path="/product/:id" element={<ProductPage />} />
-          </Route>
+            <Route
+              element={
+                <CartProvider>
+                  <Layout />
+                </CartProvider>
+              }
+            >
+              <Route path="/" element={<Catalog />} />
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/product/:id" element={<ProductPage />} />
+            </Route>
 
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
 
-      </AuthProvider>
+        </AuthProvider>
 
+      </ErrorBoundary>
     </BrowserRouter>
   )
 }
