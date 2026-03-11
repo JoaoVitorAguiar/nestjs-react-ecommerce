@@ -65,7 +65,9 @@ describe('CatalogService', () => {
 
     const result = await service.findAll();
 
-    expect(httpService.get).toHaveBeenCalledWith('https://api.example.com/products');
+    expect(httpService.get).toHaveBeenCalledWith(
+      'https://api.example.com/products',
+    );
     expect(result).toEqual([
       {
         id: 1,
@@ -103,7 +105,9 @@ describe('CatalogService', () => {
 
     const result = await service.findById(10);
 
-    expect(httpService.get).toHaveBeenCalledWith('https://api.example.com/products/10');
+    expect(httpService.get).toHaveBeenCalledWith(
+      'https://api.example.com/products/10',
+    );
     expect(result).toEqual({
       id: 10,
       title: 'Laptop',

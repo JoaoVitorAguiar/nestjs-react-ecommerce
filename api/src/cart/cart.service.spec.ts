@@ -70,14 +70,29 @@ describe('CartService', () => {
       const result = await service.getCart('user-1');
 
       expect(cartModel.findOne).toHaveBeenCalledWith({ userId: 'user-1' });
-      expect(cartModel.create).toHaveBeenCalledWith({ userId: 'user-1', items: [] });
+      expect(cartModel.create).toHaveBeenCalledWith({
+        userId: 'user-1',
+        items: [],
+      });
       expect(result).toEqual({ items: [], total: 0 });
     });
 
     it('should return existing cart with correctly calculated total', async () => {
       const existingCart = createCartDoc('user-1', [
-        { productId: 1, title: 'A', price: 10, quantity: 2, thumbnail: 'a.jpg' },
-        { productId: 2, title: 'B', price: 7.5, quantity: 4, thumbnail: 'b.jpg' },
+        {
+          productId: 1,
+          title: 'A',
+          price: 10,
+          quantity: 2,
+          thumbnail: 'a.jpg',
+        },
+        {
+          productId: 2,
+          title: 'B',
+          price: 7.5,
+          quantity: 4,
+          thumbnail: 'b.jpg',
+        },
       ]);
       cartModel.findOne.mockResolvedValue(existingCart);
 
@@ -111,7 +126,10 @@ describe('CartService', () => {
         thumbnail: 'phone.jpg',
       });
 
-      const result = await service.addItem('user-1', { productId: 1, quantity: 2 });
+      const result = await service.addItem('user-1', {
+        productId: 1,
+        quantity: 2,
+      });
 
       expect(cart.items).toEqual([
         {
@@ -128,7 +146,13 @@ describe('CartService', () => {
 
     it('should merge quantity when item already exists', async () => {
       const cart = createCartDoc('user-1', [
-        { productId: 1, title: 'Phone', price: 999, quantity: 1, thumbnail: 'phone.jpg' },
+        {
+          productId: 1,
+          title: 'Phone',
+          price: 999,
+          quantity: 1,
+          thumbnail: 'phone.jpg',
+        },
       ]);
       cartModel.findOne.mockResolvedValue(cart);
       catalogService.findById.mockResolvedValue({
@@ -138,7 +162,10 @@ describe('CartService', () => {
         thumbnail: 'phone.jpg',
       });
 
-      const result = await service.addItem('user-1', { productId: 1, quantity: 3 });
+      const result = await service.addItem('user-1', {
+        productId: 1,
+        quantity: 3,
+      });
 
       expect(cart.items).toHaveLength(1);
       expect(cart.items[0].quantity).toBe(4);
@@ -161,8 +188,20 @@ describe('CartService', () => {
 
     it('should replace quantity and recalculate total', async () => {
       const cart = createCartDoc('user-1', [
-        { productId: 1, title: 'Phone', price: 100, quantity: 2, thumbnail: 'p.jpg' },
-        { productId: 2, title: 'Mouse', price: 50, quantity: 1, thumbnail: 'm.jpg' },
+        {
+          productId: 1,
+          title: 'Phone',
+          price: 100,
+          quantity: 2,
+          thumbnail: 'p.jpg',
+        },
+        {
+          productId: 2,
+          title: 'Mouse',
+          price: 50,
+          quantity: 1,
+          thumbnail: 'm.jpg',
+        },
       ]);
       cartModel.findOne.mockResolvedValue(cart);
 
@@ -177,15 +216,33 @@ describe('CartService', () => {
   describe('removeItem', () => {
     it('should remove item by productId and keep remaining items', async () => {
       const cart = createCartDoc('user-1', [
-        { productId: 1, title: 'Phone', price: 100, quantity: 2, thumbnail: 'p.jpg' },
-        { productId: 2, title: 'Mouse', price: 50, quantity: 1, thumbnail: 'm.jpg' },
+        {
+          productId: 1,
+          title: 'Phone',
+          price: 100,
+          quantity: 2,
+          thumbnail: 'p.jpg',
+        },
+        {
+          productId: 2,
+          title: 'Mouse',
+          price: 50,
+          quantity: 1,
+          thumbnail: 'm.jpg',
+        },
       ]);
       cartModel.findOne.mockResolvedValue(cart);
 
       const result = await service.removeItem('user-1', 1);
 
       expect(cart.items).toEqual([
-        { productId: 2, title: 'Mouse', price: 50, quantity: 1, thumbnail: 'm.jpg' },
+        {
+          productId: 2,
+          title: 'Mouse',
+          price: 50,
+          quantity: 1,
+          thumbnail: 'm.jpg',
+        },
       ]);
       expect(result.total).toBe(50);
       expect(cart.save).toHaveBeenCalled();
@@ -193,7 +250,13 @@ describe('CartService', () => {
 
     it('should keep cart unchanged when removing non-existing item', async () => {
       const initialItems = [
-        { productId: 2, title: 'Mouse', price: 50, quantity: 1, thumbnail: 'm.jpg' },
+        {
+          productId: 2,
+          title: 'Mouse',
+          price: 50,
+          quantity: 1,
+          thumbnail: 'm.jpg',
+        },
       ];
       const cart = createCartDoc('user-1', [...initialItems]);
       cartModel.findOne.mockResolvedValue(cart);
@@ -209,7 +272,13 @@ describe('CartService', () => {
   describe('clearCart', () => {
     it('should clear all items and return confirmation message', async () => {
       const cart = createCartDoc('user-1', [
-        { productId: 1, title: 'Phone', price: 100, quantity: 1, thumbnail: 'p.jpg' },
+        {
+          productId: 1,
+          title: 'Phone',
+          price: 100,
+          quantity: 1,
+          thumbnail: 'p.jpg',
+        },
       ]);
       cartModel.findOne.mockResolvedValue(cart);
 
@@ -224,11 +293,17 @@ describe('CartService', () => {
   describe('syncCart', () => {
     it('should merge incoming quantities, add new items and skip unknown products', async () => {
       const cart = createCartDoc('user-1', [
-        { productId: 1, title: 'Phone', price: 100, quantity: 1, thumbnail: 'p.jpg' },
+        {
+          productId: 1,
+          title: 'Phone',
+          price: 100,
+          quantity: 1,
+          thumbnail: 'p.jpg',
+        },
       ]);
       cartModel.findOne.mockResolvedValue(cart);
 
-      catalogService.findById.mockImplementation(async (productId: number) => {
+      catalogService.findById.mockImplementation((productId: number) => {
         if (productId === 1) {
           return { id: 1, title: 'Phone', price: 100, thumbnail: 'p.jpg' };
         }
@@ -247,8 +322,20 @@ describe('CartService', () => {
 
       expect(catalogService.findById).toHaveBeenCalledTimes(4);
       expect(cart.items).toEqual([
-        { productId: 1, title: 'Phone', price: 100, quantity: 4, thumbnail: 'p.jpg' },
-        { productId: 2, title: 'Mouse', price: 50, quantity: 3, thumbnail: 'm.jpg' },
+        {
+          productId: 1,
+          title: 'Phone',
+          price: 100,
+          quantity: 4,
+          thumbnail: 'p.jpg',
+        },
+        {
+          productId: 2,
+          title: 'Mouse',
+          price: 50,
+          quantity: 3,
+          thumbnail: 'm.jpg',
+        },
       ]);
       expect(result.total).toBe(550);
       expect(cart.save).toHaveBeenCalledTimes(1);
