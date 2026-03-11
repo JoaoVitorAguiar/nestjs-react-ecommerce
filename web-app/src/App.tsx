@@ -8,6 +8,7 @@ import Register from "@/pages/RegisterPage"
 import CartPage from "@/pages/CartPage"
 import { CartProvider } from "./context/CartContext"
 import { AuthProvider } from "./context/AuthContext"
+import NotFound from "./pages/NotFound"
 
 
 export default function App() {
@@ -33,7 +34,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-
+          <Route path="*" element={<NotFound />} />
         </Routes>
 
       </AuthProvider>
