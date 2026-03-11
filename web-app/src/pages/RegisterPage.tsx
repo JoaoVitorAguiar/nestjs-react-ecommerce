@@ -1,46 +1,46 @@
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-
 import { Button } from "@/components/ui/Button"
-import { useAuth } from "@/hooks/useAuth"
+import { z } from "zod"
+import { authService } from "@/services/auth.service"
 
-const loginSchema = z.object({
+export const registerSchema = z.object({
+    name: z.string().min(2, "Name is required"),
     email: z.string().email("Invalid email"),
     password: z.string().min(6, "Password must have at least 6 characters")
 })
 
-type LoginFormData = z.infer<typeof loginSchema>
+export type RegisterFormData = z.infer<typeof registerSchema>
 
-export default function Login() {
+export default function RegisterPage() {
     const navigate = useNavigate()
-    const { login } = useAuth()
 
     const {
         register,
         handleSubmit,
         formState: { errors, isSubmitting }
-    } = useForm<LoginFormData>({
-        resolver: zodResolver(loginSchema)
+    } = useForm<RegisterFormData>({
+        resolver: zodResolver(registerSchema)
     })
 
-    async function onSubmit(data: LoginFormData) {
+    async function onSubmit(data: RegisterFormData) {
         try {
-            await login(data.email, data.password)
+            await authService.register(data)
 
-            navigate("/")
+            navigate("/login")
         } catch {
-            alert("Invalid credentials")
+            alert("Error creating account")
         }
     }
 
     return (
         <div className="min-h-screen bg-background text-text flex items-center justify-center px-4">
+
             <div className="w-full max-w-md border rounded-xl p-8 flex flex-col gap-6 shadow-sm">
 
                 <h1 className="text-2xl font-bold text-center">
-                    Login
+                    Create Account
                 </h1>
 
                 <form
@@ -49,7 +49,23 @@ export default function Login() {
                 >
 
                     <div className="flex flex-col gap-1">
+                        <label className="text-sm font-medium">
+                            Name
+                        </label>
 
+                        <input
+                            {...register("name")}
+                            className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
+
+                        {errors.name && (
+                            <span className="text-red-500 text-sm">
+                                {errors.name.message}
+                            </span>
+                        )}
+                    </div>
+
+                    <div className="flex flex-col gap-1">
                         <label className="text-sm font-medium">
                             Email
                         </label>
@@ -65,11 +81,9 @@ export default function Login() {
                                 {errors.email.message}
                             </span>
                         )}
-
                     </div>
 
                     <div className="flex flex-col gap-1">
-
                         <label className="text-sm font-medium">
                             Password
                         </label>
@@ -85,14 +99,23 @@ export default function Login() {
                                 {errors.password.message}
                             </span>
                         )}
-
                     </div>
 
                     <Button type="submit" disabled={isSubmitting}>
-                        {isSubmitting ? "Logging in..." : "Login"}
+                        {isSubmitting ? "Creating..." : "Create account"}
                     </Button>
 
                 </form>
+
+                <p className="text-sm text-center text-muted-foreground">
+                    Already have an account?{" "}
+                    <Link
+                        to="/login"
+                        className="text-primary font-medium hover:underline"
+                    >
+                        Login
+                    </Link>
+                </p>
 
             </div>
 

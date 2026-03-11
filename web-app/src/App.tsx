@@ -1,12 +1,13 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 
-import Catalog from "@/pages/Catalog"
+import Catalog from "@/pages/CatalogPage"
 import Cart from "@/pages/Cart"
-import Login from "@/pages/Login"
+import Login from "@/pages/LoginPage"
 import Layout from "@/components/layout/Layout"
 import ProductPage from "@/pages/ProductPage"
 import { CartProvider } from "./context/CartContext"
 import { AuthProvider } from "./context/AuthContext"
+import Register from "./pages/RegisterPage"
 
 
 export default function App() {
@@ -30,6 +31,8 @@ export default function App() {
           </Route>
 
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+
 
         </Routes>
 

@@ -1,6 +1,6 @@
 import type { CartItem } from "@/types/CartItem"
 import type { Product } from "@/types/Product"
-import { createContext, useEffect, useState, type ReactNode } from "react"
+import { createContext, useState, type ReactNode } from "react"
 
 type CartContextType = {
   items: CartItem[]

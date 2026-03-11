@@ -28,6 +28,11 @@ class AuthService {
     getToken() {
         return localStorage.getItem("token")
     }
+
+    async register(data: { name: string; email: string; password: string }) {
+        const response = await api.post("/auth/sign-up", data)
+        return response.data
+    }
 }
 
 export const authService = new AuthService()
