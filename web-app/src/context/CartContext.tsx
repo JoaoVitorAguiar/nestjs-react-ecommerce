@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import type { ReactNode } from "react"
 
 import * as cartService from "@/services/cart.service"
@@ -6,16 +6,7 @@ import * as cartService from "@/services/cart.service"
 import type { CartItem } from "@/types/CartItem"
 import type { Product } from "@/types/Product"
 import { useAuth } from "@/hooks/useAuth"
-
-type CartContextType = {
-  items: CartItem[]
-  addToCart: (product: Product, quantity?: number) => Promise<void>
-  removeFromCart: (productId: number) => Promise<void>
-  updateQuantity: (productId: number, quantity: number) => Promise<void>
-  clearCart: () => Promise<void>
-}
-
-export const CartContext = createContext<CartContextType | null>(null)
+import { CartContext } from "./cart-context"
 
 export function CartProvider({ children }: { children: ReactNode }) {
 
@@ -31,24 +22,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return Array.isArray(local) ? local : []
   }
 
-  useEffect(() => {
-
-    const localCart = loadLocalCart()
-
-    if (!isAuthenticated) {
-      setItems(localCart)
-      return
-    }
-
-    if (localCart.length > 0) {
-      syncLocalCart(localCart)
-      return
-    }
-
-    loadServerCart()
-
-  }, [isAuthenticated])
-
   async function loadServerCart() {
     const serverCart = await cartService.getCart()
     setItems(serverCart)
@@ -62,6 +35,27 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     localStorage.removeItem("cart")
   }
+
+  useEffect(() => {
+
+    const localCart = loadLocalCart()
+
+    if (!isAuthenticated) {
+      queueMicrotask(() => {
+        setItems(localCart)
+      })
+      return
+    }
+
+    if (localCart.length > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      void syncLocalCart(localCart)
+      return
+    }
+
+    void loadServerCart()
+
+  }, [isAuthenticated])
 
   async function addToCart(product: Product, quantity = 1) {
 

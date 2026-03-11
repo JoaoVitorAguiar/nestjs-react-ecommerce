@@ -2,7 +2,7 @@ import { Link } from "react-router-dom"
 import { useContext } from "react"
 import { ShoppingCart } from "lucide-react"
 
-import { CartContext } from "@/context/CartContext"
+import { CartContext } from "@/context/cart-context"
 
 export function NavLinks() {
 

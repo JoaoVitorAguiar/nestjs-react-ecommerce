@@ -1,6 +1,6 @@
 import { useContext } from "react"
 
-import { CartContext } from "@/context/CartContext"
+import { CartContext } from "@/context/cart-context"
 
 import { Container } from "@/components/ui/Container"
 import { CartItem } from "@/components/cart/CartItem"

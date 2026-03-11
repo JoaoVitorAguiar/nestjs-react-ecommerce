@@ -10,7 +10,15 @@ export type UpdateCartItemPayload = {
     quantity: number
 }
 
-function mapCartItems(items: any[]): CartItem[] {
+type RawCartItem = {
+    productId: number
+    title: string
+    price: number
+    quantity: number
+    thumbnail: string
+}
+
+function mapCartItems(items: RawCartItem[]): CartItem[] {
     return items.map(item => ({
         product: {
             id: item.productId,

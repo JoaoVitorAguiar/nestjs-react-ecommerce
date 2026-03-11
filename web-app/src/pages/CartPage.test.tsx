@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import type { ContextType } from 'react'
 import CartPage from './CartPage'
-import { CartContext } from '@/context/CartContext'
+import { CartContext } from '@/context/cart-context'
 import type { CartItem } from '@/types/CartItem'
 import type { Product } from '@/types/Product'
 

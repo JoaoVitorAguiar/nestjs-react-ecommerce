@@ -1,26 +1,10 @@
 import { authService } from "@/services/auth.service"
-import { createContext, useEffect, useState } from "react"
+import { useState } from "react"
 import type { ReactNode } from "react"
-
-
-type AuthContextType = {
-    isAuthenticated: boolean
-    login: (email: string, password: string) => Promise<void>
-    logout: () => void
-}
-
-export const AuthContext = createContext<AuthContextType | null>(null)
+import { AuthContext } from "./auth-context"
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-    const [isAuthenticated, setIsAuthenticated] = useState(false)
-
-    useEffect(() => {
-        const token = authService.getToken()
-
-        if (token) {
-            setIsAuthenticated(true)
-        }
-    }, [])
+    const [isAuthenticated, setIsAuthenticated] = useState(() => Boolean(authService.getToken()))
 
     async function login(email: string, password: string) {
         await authService.login({ email, password })
