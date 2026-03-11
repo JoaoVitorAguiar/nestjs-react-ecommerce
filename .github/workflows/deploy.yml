@@ -37,8 +37,7 @@ jobs:
             if [ ! -d ".git" ]; then
               git clone https://github.com/${REPO}.git .
             else
-              git fetch origin main
-              git reset --hard origin/main
+              git pull --ff-only origin main
             fi
 
             cat > api/.env <<EOF
@@ -52,8 +51,10 @@ jobs:
             EOF
 
             cat > web-app/.env <<EOF
-            VITE_API_URL=${VITE_API_URL}
+            VITE_API_URL=${VITE_API_URL:-/api}
             EOF
+
+            docker network create ecommerce-network || true
 
             docker build -t ecommerce-api ./api
             docker build -t ecommerce-web ./web-app
@@ -66,10 +67,12 @@ jobs:
             docker run -d \
               --name ecommerce-api \
               --env-file ./api/.env \
+              --network ecommerce-network \
               -p 8080:8080 \
               ecommerce-api
 
             docker run -d \
               --name ecommerce-web \
+              --network ecommerce-network \
               -p 80:80 \
               ecommerce-web
