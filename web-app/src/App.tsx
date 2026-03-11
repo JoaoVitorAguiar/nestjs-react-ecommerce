@@ -6,27 +6,34 @@ import Login from "@/pages/Login"
 import Layout from "@/components/layout/Layout"
 import ProductPage from "@/pages/ProductPage"
 import { CartProvider } from "./context/CartContext"
+import { AuthProvider } from "./context/AuthContext"
 
 
 export default function App() {
   return (
     <BrowserRouter>
 
-      <Routes>
+      <AuthProvider>
 
-        <Route element={
-          <CartProvider>
-            <Layout />
-          </CartProvider>
-        }>
+        <Routes>
 
-          <Route path="/" element={<Catalog />} />
-          <Route path="/cart" element={<Cart />} />
+          <Route
+            element={
+              <CartProvider>
+                <Layout />
+              </CartProvider>
+            }
+          >
+            <Route path="/" element={<Catalog />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/product/:id" element={<ProductPage />} />
+          </Route>
+
           <Route path="/login" element={<Login />} />
-          <Route path="/product/:id" element={<ProductPage />} />
-        </Route>
 
-      </Routes>
+        </Routes>
+
+      </AuthProvider>
 
     </BrowserRouter>
   )

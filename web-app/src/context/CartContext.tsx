@@ -38,10 +38,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems([])
   }
 
-  useEffect(() => {
-    console.log(items)
-  }, [items])
-
   return (
     <CartContext.Provider
       value={{ items, addToCart, removeFromCart, clearCart }}
