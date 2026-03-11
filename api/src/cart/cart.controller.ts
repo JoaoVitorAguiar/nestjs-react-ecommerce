@@ -8,13 +8,15 @@ import {
   Param,
   Req,
   UseGuards,
-  ParseIntPipe
+  ParseIntPipe,
+  BadRequestException
 } from '@nestjs/common';
 
 import { CartService } from './cart.service';
 import { AddItemDto } from './dto/add-item.dto';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { UpdateItemDto } from './dto/update-item.dto';
+import { SyncCartDto } from './dto/sync-cart.dto';
 
 @Controller('cart')
 @UseGuards(AuthGuard)
@@ -33,6 +35,14 @@ export class CartController {
     @Body() dto: AddItemDto
   ) {
     return this.cartService.addItem(req.user.sub, dto);
+  }
+
+  @Post('sync')
+  async syncCart(
+    @Req() req,
+    @Body() dto: SyncCartDto
+  ) {
+    return this.cartService.syncCart(req.user.sub, dto.items)
   }
 
   @Patch('items/:productId')

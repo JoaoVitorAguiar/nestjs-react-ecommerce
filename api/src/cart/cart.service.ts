@@ -120,4 +120,37 @@ export class CartService {
     }
   }
 
+
+  async syncCart(userId: string, items: { productId: number; quantity: number }[]) {
+
+    const cart = await this.getOrCreateCart(userId)
+
+    for (const item of items) {
+
+      const product = await this.catalogService.findById(item.productId)
+
+      if (!product) continue
+
+      const existingItem = cart.items.find(
+        (i) => i.productId === item.productId
+      )
+
+      if (existingItem) {
+        existingItem.quantity += item.quantity
+      } else {
+        cart.items.push({
+          productId: product.id,
+          title: product.title,
+          price: product.price,
+          thumbnail: product.thumbnail,
+          quantity: item.quantity
+        })
+      }
+
+    }
+
+    await cart.save()
+
+    return this.formatCart(cart)
+  }
 }

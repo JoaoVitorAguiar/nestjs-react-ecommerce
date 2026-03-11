@@ -12,7 +12,6 @@ type LoginResponse = {
 class AuthService {
     async login(data: LoginPayload) {
         const response = await api.post<LoginResponse>("/auth/sign-in", data)
-        console.log(response.data)
 
         const { access_token } = response.data
 
@@ -23,6 +22,7 @@ class AuthService {
 
     logout() {
         localStorage.removeItem("token")
+        localStorage.removeItem("cart")
     }
 
     getToken() {

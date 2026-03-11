@@ -22,51 +22,68 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
   const { isAuthenticated } = useAuth()
 
+  function saveLocalCart(cart: CartItem[]) {
+    localStorage.setItem("cart", JSON.stringify(cart))
+  }
+
+  function loadLocalCart(): CartItem[] {
+    const local = JSON.parse(localStorage.getItem("cart") || "[]")
+    return Array.isArray(local) ? local : []
+  }
+
   useEffect(() => {
 
-    const local = JSON.parse(localStorage.getItem("cart") || "[]")
+    const localCart = loadLocalCart()
 
-    setItems(Array.isArray(local) ? local : [])
-
-    if (isAuthenticated) {
-      loadServerCart()
+    if (!isAuthenticated) {
+      setItems(localCart)
+      return
     }
+
+    if (localCart.length > 0) {
+      syncLocalCart(localCart)
+      return
+    }
+
+    loadServerCart()
 
   }, [isAuthenticated])
 
-
   async function loadServerCart() {
-
     const serverCart = await cartService.getCart()
+    setItems(serverCart)
+  }
+
+  async function syncLocalCart(localCart: CartItem[]) {
+
+    const serverCart = await cartService.syncCart(localCart)
 
     setItems(serverCart)
 
-    localStorage.setItem("cart", JSON.stringify(serverCart))
+    localStorage.removeItem("cart")
   }
-
 
   async function addToCart(product: Product, quantity = 1) {
 
-    setItems(prev => {
+    const existing = items.find(i => i.product.id === product.id)
 
-      const existing = prev.find(i => i.product.id === product.id)
+    let updated: CartItem[]
 
-      let updated
+    if (existing) {
+      updated = items.map(i =>
+        i.product.id === product.id
+          ? { ...i, quantity: i.quantity + quantity }
+          : i
+      )
+    } else {
+      updated = [...items, { product, quantity }]
+    }
 
-      if (existing) {
-        updated = prev.map(i =>
-          i.product.id === product.id
-            ? { ...i, quantity: i.quantity + quantity }
-            : i
-        )
-      } else {
-        updated = [...prev, { product, quantity }]
-      }
+    setItems(updated)
 
-      localStorage.setItem("cart", JSON.stringify(updated))
-
-      return updated
-    })
+    if (!isAuthenticated) {
+      saveLocalCart(updated)
+    }
 
     if (isAuthenticated) {
       await cartService.addCartItem({
@@ -76,56 +93,52 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }
 
-
   async function updateQuantity(productId: number, quantity: number) {
 
-    setItems(prev => {
+    const updated = items.map(i =>
+      i.product.id === productId
+        ? { ...i, quantity }
+        : i
+    )
 
-      const updated = prev.map(i =>
-        i.product.id === productId
-          ? { ...i, quantity }
-          : i
-      )
+    setItems(updated)
 
-      localStorage.setItem("cart", JSON.stringify(updated))
-
-      return updated
-    })
+    if (!isAuthenticated) {
+      saveLocalCart(updated)
+    }
 
     if (isAuthenticated) {
       await cartService.updateCartItem(productId, { quantity })
     }
   }
 
-
   async function removeFromCart(productId: number) {
 
-    setItems(prev => {
+    const updated = items.filter(i => i.product.id !== productId)
 
-      const updated = prev.filter(i => i.product.id !== productId)
+    setItems(updated)
 
-      localStorage.setItem("cart", JSON.stringify(updated))
-
-      return updated
-    })
+    if (!isAuthenticated) {
+      saveLocalCart(updated)
+    }
 
     if (isAuthenticated) {
       await cartService.removeCartItem(productId)
     }
   }
 
-
   async function clearCart() {
 
     setItems([])
 
-    localStorage.removeItem("cart")
+    if (!isAuthenticated) {
+      localStorage.removeItem("cart")
+    }
 
     if (isAuthenticated) {
       await cartService.clearCart()
     }
   }
-
 
   return (
     <CartContext.Provider

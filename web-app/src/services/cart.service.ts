@@ -35,6 +35,19 @@ export async function addCartItem(dto: AddCartItemPayload): Promise<CartItem[]> 
     return mapCartItems(response.data.items)
 }
 
+export async function syncCart(items: CartItem[]): Promise<CartItem[]> {
+    const payload = items.map(i => ({
+        productId: i.product.id,
+        quantity: i.quantity
+    }))
+
+    const response = await api.post("/cart/sync", {
+        items: payload
+    })
+
+    return mapCartItems(response.data.items)
+}
+
 export async function updateCartItem(
     productId: number,
     dto: UpdateCartItemPayload
