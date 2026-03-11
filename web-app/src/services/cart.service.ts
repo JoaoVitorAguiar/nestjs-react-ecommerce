@@ -18,16 +18,20 @@ type RawCartItem = {
     thumbnail: string
 }
 
-function mapCartItems(items: RawCartItem[]): CartItem[] {
+function mapCartItems(items: unknown): CartItem[] {
+    if (!Array.isArray(items)) {
+        throw new Error("Invalid cart response: expected items array")
+    }
+
     return items.map(item => ({
         product: {
-            id: item.productId,
-            title: item.title,
-            price: item.price,
+            id: (item as RawCartItem).productId,
+            title: (item as RawCartItem).title,
+            price: (item as RawCartItem).price,
             rating: 0,
-            thumbnail: item.thumbnail
+            thumbnail: (item as RawCartItem).thumbnail
         },
-        quantity: item.quantity
+        quantity: (item as RawCartItem).quantity
     }))
 }
 
