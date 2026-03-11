@@ -11,7 +11,7 @@ export function Button({ variant = "primary", className = "", ...props }: Props)
 
   return (
     <button
-      className={`px-4 py-2 rounded-lg font-medium transition ${variants[variant]} ${className}`}
+      className={`px-4 py-2 rounded-lg font-medium transition cursor-pointer ${variants[variant]} ${className}`}
       {...props}
     />
   )
