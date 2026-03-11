@@ -7,15 +7,15 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true
-    })
+      whitelist: true,
+    }),
   );
-  const configService = app.get(ConfigService)
+  const configService = app.get(ConfigService);
   app.enableCors({
-    origin: configService.get<string[]>("cors.origins"),
-    credentials: true
-  })
+    origin: configService.get<string[]>('cors.origins'),
+    credentials: true,
+  });
 
   await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+void bootstrap();

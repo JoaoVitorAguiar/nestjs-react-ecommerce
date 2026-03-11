@@ -13,21 +13,37 @@ jest.mock('bcrypt', () => ({
 }));
 
 describe('AuthService', () => {
+  type UserModelInstance = {
+    save: jest.Mock<Promise<void>, []>;
+  };
+
+  type UserModelConstructorInput = {
+    name: string;
+    email: string;
+    passwordHash: string;
+  };
+
   let service: AuthService;
-  let userModel: jest.Mock & { findOne: jest.Mock };
+  let saveMock: jest.Mock<Promise<void>, []>;
+  let userModel: jest.Mock<UserModelInstance, [UserModelConstructorInput]> & {
+    findOne: jest.Mock<
+      Promise<{ _id: string; passwordHash?: string } | null>,
+      [{ email: string }]
+    >;
+  };
   let jwtService: { signAsync: jest.Mock };
   let configService: { get: jest.Mock };
 
-  const mockedBcrypt = bcrypt as jest.Mocked<typeof bcrypt>; `
-  `
+  const mockedBcrypt = bcrypt as jest.Mocked<typeof bcrypt>;
+
   beforeEach(async () => {
     const findOne = jest.fn();
-    const save = jest.fn();
+    saveMock = jest.fn<Promise<void>, []>().mockResolvedValue(undefined);
 
     userModel = Object.assign(
-      jest.fn().mockImplementation((data) => ({
+      jest.fn().mockImplementation((data: UserModelConstructorInput) => ({
         ...data,
-        save,
+        save: saveMock,
       })),
       { findOne },
     );
@@ -77,7 +93,9 @@ describe('AuthService', () => {
     it('should throw ConflictException when email already exists', async () => {
       userModel.findOne.mockResolvedValue({ _id: 'existing-user' });
 
-      await expect(service.signUp(dto)).rejects.toBeInstanceOf(ConflictException);
+      await expect(service.signUp(dto)).rejects.toBeInstanceOf(
+        ConflictException,
+      );
       expect(userModel.findOne).toHaveBeenCalledWith({ email: dto.email });
       expect(mockedBcrypt.hash).not.toHaveBeenCalled();
     });
@@ -96,8 +114,7 @@ describe('AuthService', () => {
         email: dto.email,
         passwordHash: 'hashed-password',
       });
-      const createdUser = userModel.mock.results[0]?.value;
-      expect(createdUser.save).toHaveBeenCalled();
+      expect(saveMock).toHaveBeenCalled();
       expect(result).toEqual({ message: 'User created successfully' });
     });
   });
@@ -111,7 +128,9 @@ describe('AuthService', () => {
     it('should throw UnauthorizedException when user is not found', async () => {
       userModel.findOne.mockResolvedValue(null);
 
-      await expect(service.signIn(dto)).rejects.toBeInstanceOf(UnauthorizedException);
+      await expect(service.signIn(dto)).rejects.toBeInstanceOf(
+        UnauthorizedException,
+      );
       expect(userModel.findOne).toHaveBeenCalledWith({ email: dto.email });
       expect(mockedBcrypt.compare).not.toHaveBeenCalled();
     });
@@ -123,8 +142,13 @@ describe('AuthService', () => {
       });
       (mockedBcrypt.compare as jest.Mock).mockResolvedValue(false);
 
-      await expect(service.signIn(dto)).rejects.toBeInstanceOf(UnauthorizedException);
-      expect(mockedBcrypt.compare).toHaveBeenCalledWith(dto.password, 'stored-hash');
+      await expect(service.signIn(dto)).rejects.toBeInstanceOf(
+        UnauthorizedException,
+      );
+      expect(mockedBcrypt.compare).toHaveBeenCalledWith(
+        dto.password,
+        'stored-hash',
+      );
       expect(jwtService.signAsync).not.toHaveBeenCalled();
     });
 
@@ -139,7 +163,10 @@ describe('AuthService', () => {
       const result = await service.signIn(dto);
 
       expect(userModel.findOne).toHaveBeenCalledWith({ email: dto.email });
-      expect(mockedBcrypt.compare).toHaveBeenCalledWith(dto.password, 'stored-hash');
+      expect(mockedBcrypt.compare).toHaveBeenCalledWith(
+        dto.password,
+        'stored-hash',
+      );
       expect(jwtService.signAsync).toHaveBeenCalledWith({ sub: 'user-id' });
       expect(result).toEqual({ access_token: 'jwt-token' });
     });

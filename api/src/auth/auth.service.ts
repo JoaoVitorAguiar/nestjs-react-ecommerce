@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { SignUpDto } from './dto/sign-up.dto';
 import { User, UserDocument } from './entities/user.entity';
@@ -13,11 +17,10 @@ export class AuthService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     private jwtService: JwtService,
-    private configService: ConfigService
-  ) { }
+    private configService: ConfigService,
+  ) {}
 
   async signUp(dto: SignUpDto) {
-
     const userExists = await this.userModel.findOne({ email: dto.email });
 
     if (userExists) {
@@ -29,18 +32,17 @@ export class AuthService {
     const user = new this.userModel({
       name: dto.name,
       email: dto.email,
-      passwordHash
+      passwordHash,
     });
 
     await user.save();
 
     return {
-      message: 'User created successfully'
+      message: 'User created successfully',
     };
   }
 
   async signIn(dto: SignInDto) {
-
     const user = await this.userModel.findOne({ email: dto.email });
 
     if (!user) {
@@ -60,10 +62,9 @@ export class AuthService {
     const accessToken = await this.jwtService.signAsync(payload);
 
     return {
-      access_token: accessToken
+      access_token: accessToken,
     };
   }
-
 
   private async hash(password: string): Promise<string> {
     const rounds = this.configService.get<number>('bcrypt.rounds')!;

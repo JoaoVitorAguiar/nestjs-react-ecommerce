@@ -8,12 +8,11 @@ import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      { name: Cart.name, schema: CartSchema }
-    ]),
+    MongooseModule.forFeature([{ name: Cart.name, schema: CartSchema }]),
     CatalogModule,
     AuthModule,
-  ], controllers: [CartController],
+  ],
+  controllers: [CartController],
   providers: [CartService],
 })
-export class CartModule { }
+export class CartModule {}

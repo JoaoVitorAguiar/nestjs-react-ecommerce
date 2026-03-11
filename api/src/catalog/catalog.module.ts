@@ -4,10 +4,9 @@ import { CatalogController } from './catalog.controller';
 import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [HttpModule,],
+  imports: [HttpModule],
   controllers: [CatalogController],
   providers: [CatalogService],
   exports: [CatalogService],
-
 })
-export class CatalogModule { }
+export class CatalogModule {}
