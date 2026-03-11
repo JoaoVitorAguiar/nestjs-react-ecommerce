@@ -1,20 +1,60 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { CatalogController } from './catalog.controller';
 import { CatalogService } from './catalog.service';
 
 describe('CatalogController', () => {
   let controller: CatalogController;
+  let catalogService: { findAll: jest.Mock; findById: jest.Mock };
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [CatalogController],
-      providers: [CatalogService],
-    }).compile();
+  beforeEach(() => {
+    catalogService = {
+      findAll: jest.fn(),
+      findById: jest.fn(),
+    };
 
-    controller = module.get<CatalogController>(CatalogController);
+    controller = new CatalogController(
+      catalogService as unknown as CatalogService,
+    );
   });
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
+  });
+
+  it('should delegate findAll to CatalogService', async () => {
+    const expected = [
+      {
+        id: 1,
+        title: 'Phone',
+        price: 999,
+        rating: 4.7,
+        thumbnail: 'thumb-1.jpg',
+      },
+    ];
+    catalogService.findAll.mockResolvedValue(expected);
+
+    const result = await controller.findAll();
+
+    expect(catalogService.findAll).toHaveBeenCalled();
+    expect(result).toEqual(expected);
+  });
+
+  it('should delegate findOne to CatalogService.findById', async () => {
+    const expected = {
+      id: 10,
+      title: 'Laptop',
+      description: 'High performance',
+      price: 2499,
+      rating: 4.8,
+      stock: 12,
+      brand: 'BrandX',
+      images: ['img-1.jpg'],
+      thumbnail: 'thumb-10.jpg',
+    };
+    catalogService.findById.mockResolvedValue(expected);
+
+    const result = await controller.findOne(10);
+
+    expect(catalogService.findById).toHaveBeenCalledWith(10);
+    expect(result).toEqual(expected);
   });
 });
