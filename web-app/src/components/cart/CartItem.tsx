@@ -1,4 +1,5 @@
 import { useContext } from "react"
+import { Link } from "react-router-dom"
 import { CartContext } from "@/context/CartContext"
 
 import { Card } from "@/components/ui/Card"
@@ -37,29 +38,36 @@ export function CartItem({ item, onRemove }: Props) {
     return (
         <Card className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
 
-            <img
-                src={item.product.thumbnail}
-                alt={item.product.title}
-                className="w-full sm:w-24 h-40 sm:h-24 object-cover rounded-md"
-            />
+            <Link
+                to={`/product/${item.product.id}`}
+                className="flex gap-4 items-start sm:items-center flex-1 group"
+            >
 
-            <div className="flex flex-col flex-1 gap-1">
-
-                <h2 className="font-semibold">
-                    {item.product.title}
-                </h2>
-
-                <p className="text-sm text-muted-foreground">
-                    ${item.product.price}
-                </p>
-
-                <QuantitySelector
-                    quantity={item.quantity}
-                    onIncrease={increase}
-                    onDecrease={decrease}
+                <img
+                    src={item.product.thumbnail}
+                    alt={item.product.title}
+                    className="w-full sm:w-24 h-40 sm:h-24 object-cover rounded-md"
                 />
 
-            </div>
+                <div className="flex flex-col gap-1">
+
+                    <h2 className="font-semibold group-hover:underline">
+                        {item.product.title}
+                    </h2>
+
+                    <p className="text-sm text-muted-foreground">
+                        ${item.product.price}
+                    </p>
+
+                </div>
+
+            </Link>
+
+            <QuantitySelector
+                quantity={item.quantity}
+                onIncrease={increase}
+                onDecrease={decrease}
+            />
 
             <Button
                 variant="secondary"
