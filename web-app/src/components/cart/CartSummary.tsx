@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/Card"
 import { Button } from "@/components/ui/Button"
+import { toast } from "sonner"
 
 type Props = {
     total: number
@@ -22,7 +23,10 @@ export function CartSummary({ total, onClear }: Props) {
                 </span>
             </div>
 
-            <Button className="w-full">
+            <Button
+                className="w-full"
+                onClick={() => toast.info("Checkout coming soon")}
+            >
                 Checkout
             </Button>
 

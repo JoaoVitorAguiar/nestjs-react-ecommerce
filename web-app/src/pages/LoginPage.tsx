@@ -5,6 +5,7 @@ import { z } from "zod"
 
 import { Button } from "@/components/ui/Button"
 import { useAuth } from "@/hooks/useAuth"
+import { toast } from "sonner"
 
 const loginSchema = z.object({
     email: z.string().email("Invalid email"),
@@ -28,10 +29,10 @@ export default function LoginPage() {
     async function onSubmit(data: LoginFormData) {
         try {
             await login(data.email, data.password)
-
+            toast.success("Logged in successfully")
             navigate("/")
         } catch {
-            alert("Invalid credentials")
+            toast.error("Invalid credentials")
         }
     }
 

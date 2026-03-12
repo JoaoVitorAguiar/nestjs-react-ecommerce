@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { UserRound } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
 import { Button } from "../ui/Button"
+import { toast } from "sonner"
 
 type UserMenuProps = {
     className?: string
@@ -16,6 +17,7 @@ export function UserMenu({ className = "", mobile = false, onAction }: UserMenuP
 
     function handleLogout() {
         logout()
+        toast.success("Logged out")
         navigate("/")
         onAction?.()
     }
