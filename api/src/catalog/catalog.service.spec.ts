@@ -43,6 +43,9 @@ describe('CatalogService', () => {
     httpService.get.mockReturnValue(
       of({
         data: {
+          total: 200,
+          limit: 12,
+          skip: 0,
           products: [
             {
               id: 1,
@@ -63,27 +66,33 @@ describe('CatalogService', () => {
       }),
     );
 
-    const result = await service.findAll();
+    const result = await service.findAll(1, 12);
 
     expect(httpService.get).toHaveBeenCalledWith(
-      'https://api.example.com/products',
+      'https://api.example.com/products?limit=12&skip=0',
     );
-    expect(result).toEqual([
-      {
-        id: 1,
-        title: 'Phone',
-        price: 999,
-        rating: 4.7,
-        thumbnail: 'thumb-1.jpg',
-      },
-      {
-        id: 2,
-        title: 'Headphones',
-        price: 199,
-        rating: 4.2,
-        thumbnail: 'thumb-2.jpg',
-      },
-    ]);
+    expect(result).toEqual({
+      items: [
+        {
+          id: 1,
+          title: 'Phone',
+          price: 999,
+          rating: 4.7,
+          thumbnail: 'thumb-1.jpg',
+        },
+        {
+          id: 2,
+          title: 'Headphones',
+          price: 199,
+          rating: 4.2,
+          thumbnail: 'thumb-2.jpg',
+        },
+      ],
+      page: 1,
+      limit: 12,
+      total: 200,
+      totalPages: 17,
+    });
   });
 
   it('should fetch and map product detail in findById', async () => {

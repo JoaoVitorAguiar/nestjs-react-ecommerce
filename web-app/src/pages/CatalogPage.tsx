@@ -1,29 +1,30 @@
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { ProductGrid } from "@/components/product/ProductGrid"
-import type { Product } from "@/types/Product"
-import { getProducts } from "@/services/product.service"
+import { useProducts } from "@/hooks/useProducts"
+import { Button } from "@/components/ui/Button"
 
 export default function CatalogPage() {
-
-    const [products, setProducts] = useState<Product[]>([])
-    const [loading, setLoading] = useState(true)
+    const {
+        products,
+        page,
+        totalPages,
+        total,
+        hasNextPage,
+        hasPreviousPage,
+        nextPage,
+        previousPage,
+        isLoading,
+        isError,
+        error
+    } = useProducts()
 
     useEffect(() => {
-        async function loadProducts() {
-            try {
-                const data = await getProducts()
-                setProducts(data)
-            } catch (error) {
-                console.error("Error loading products:", error)
-            } finally {
-                setLoading(false)
-            }
+        if (isError && error) {
+            console.error("Error loading products:", error)
         }
+    }, [isError, error])
 
-        loadProducts()
-    }, [])
-
-    if (loading) {
+    if (isLoading) {
         return (
             <div className="flex justify-center py-20">
                 <p>Loading products...</p>
@@ -39,6 +40,29 @@ export default function CatalogPage() {
             </h1>
 
             <ProductGrid products={products} />
+
+            <div className="flex items-center justify-between gap-3 border-t border-white/10 pt-4">
+                <p className="text-sm text-muted-foreground">
+                    Page {page} of {totalPages} - {total} items
+                </p>
+
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant="secondary"
+                        onClick={previousPage}
+                        disabled={!hasPreviousPage}
+                    >
+                        Previous
+                    </Button>
+                    <Button
+                        variant="secondary"
+                        onClick={nextPage}
+                        disabled={!hasNextPage}
+                    >
+                        Next
+                    </Button>
+                </div>
+            </div>
 
         </div>
     )
