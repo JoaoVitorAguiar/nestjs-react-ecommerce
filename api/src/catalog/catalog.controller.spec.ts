@@ -30,12 +30,24 @@ describe('CatalogController', () => {
         thumbnail: 'thumb-1.jpg',
       },
     ];
-    catalogService.findAll.mockResolvedValue(expected);
+    catalogService.findAll.mockResolvedValue({
+      items: expected,
+      page: 2,
+      limit: 8,
+      total: 30,
+      totalPages: 4,
+    });
 
-    const result = await controller.findAll();
+    const result = await controller.findAll(2, 8);
 
-    expect(catalogService.findAll).toHaveBeenCalled();
-    expect(result).toEqual(expected);
+    expect(catalogService.findAll).toHaveBeenCalledWith(2, 8);
+    expect(result).toEqual({
+      items: expected,
+      page: 2,
+      limit: 8,
+      total: 30,
+      totalPages: 4,
+    });
   });
 
   it('should delegate findOne to CatalogService.findById', async () => {

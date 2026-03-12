@@ -15,6 +15,9 @@ type CatalogProductSummaryApi = {
 
 type CatalogListApiResponse = {
   products: CatalogProductSummaryApi[];
+  total: number;
+  limit: number;
+  skip: number;
 };
 
 type CatalogProductDetailApi = {
@@ -39,12 +42,24 @@ export class CatalogService {
     this.baseUrl = this.configService.get<string>('catalog.baseUrl')!;
   }
 
-  async findAll(): Promise<ProductSummaryDto[]> {
+  async findAll(page = 1, limit = 12): Promise<{
+    items: ProductSummaryDto[];
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  }> {
+    const safePage = Math.max(1, page);
+    const safeLimit = Math.min(Math.max(1, limit), 100);
+    const skip = (safePage - 1) * safeLimit;
+
     const response = await firstValueFrom(
-      this.httpService.get<CatalogListApiResponse>(`${this.baseUrl}/products`),
+      this.httpService.get<CatalogListApiResponse>(
+        `${this.baseUrl}/products?limit=${safeLimit}&skip=${skip}`,
+      ),
     );
 
-    return response.data.products.map(
+    const items = response.data.products.map(
       (product): ProductSummaryDto => ({
         id: product.id,
         title: product.title,
@@ -53,6 +68,17 @@ export class CatalogService {
         thumbnail: product.thumbnail,
       }),
     );
+
+    const total = response.data.total;
+    const totalPages = Math.max(1, Math.ceil(total / safeLimit));
+
+    return {
+      items,
+      page: safePage,
+      limit: safeLimit,
+      total,
+      totalPages,
+    };
   }
 
   async findById(id: number): Promise<ProductDetailDto> {
