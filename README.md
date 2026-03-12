@@ -99,8 +99,8 @@ FluxStore e uma aplicacao fullstack de catalogo e carrinho de compras.
 
 ## Documentacao por modulo
 
-- Backend: [api/README.md](/home/aguiar/projects/billify/api/README.md)
-- Frontend: [web-app/README.md](/home/aguiar/projects/billify/web-app/README.md)
+- Backend: [api/README.md](https://github.com/JoaoVitorAguiar/nestjs-react-ecommerce/tree/main/api)
+- Frontend: [web-app/README.md](https://github.com/JoaoVitorAguiar/nestjs-react-ecommerce/tree/main/web-app)
 
 ## Como executar
 
