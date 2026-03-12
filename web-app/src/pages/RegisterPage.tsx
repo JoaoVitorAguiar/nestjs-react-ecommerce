@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/Button"
 import { authService } from "@/services/auth.service"
 import { registerSchema, type RegisterFormData } from "./register.schema"
+import { toast } from "sonner"
 
 export default function RegisterPage() {
     const navigate = useNavigate()
@@ -19,10 +20,10 @@ export default function RegisterPage() {
     async function onSubmit(data: RegisterFormData) {
         try {
             await authService.register(data)
-
+            toast.success("Account created. You can log in now.")
             navigate("/login")
         } catch {
-            alert("Error creating account")
+            toast.error("Error creating account")
         }
     }
 
