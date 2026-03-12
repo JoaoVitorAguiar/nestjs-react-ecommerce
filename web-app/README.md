@@ -1,73 +1,124 @@
-# React + TypeScript + Vite
+# FluxStore Web
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend da aplicacao FluxStore, construido com React + TypeScript.
 
-Currently, two official plugins are available:
+## Responsabilidades
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- interface de autenticacao (login e cadastro)
+- listagem de catalogo com paginacao
+- visualizacao de detalhe de produto
+- gestao de carrinho para visitante e usuario autenticado
 
-## React Compiler
+## Tecnologias
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19
+- TypeScript
+- Vite
+- React Router
+- Axios
+- React Hook Form
+- Zod
+- TanStack Query
+- Tailwind CSS
+- Sonner (toasts)
+- Vitest + Testing Library
 
-## Expanding the ESLint configuration
+## Contexts (state management)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### `AuthContext`
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- guarda estado `isAuthenticated`
+- expone `login` e `logout`
+- persiste token no `localStorage`
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### `ProductsContext`
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- centraliza pagina atual e dados do catalogo
+- usa TanStack Query para cache, retry e stale time
+- expone navegacao de paginas (`nextPage`, `previousPage`, `setPage`)
+
+### `CartContext`
+
+- centraliza estado de itens do carrinho
+- expone operacoes de CRUD (`addToCart`, `updateQuantity`, `removeFromCart`, `clearCart`)
+- aplica atualizacao otimista na UI
+- usa estrategia local/remota conforme autenticacao
+
+## Padroes de projeto aplicados
+
+- Provider + custom hooks (`useAuth`, `useProducts`, `useCart`)
+- Service layer para chamadas HTTP (`services/*`)
+- Strategy pattern para carrinho:
+  - `LocalCartStrategy`
+  - `ServerCartStrategy`
+- Separacao entre componentes de UI, layout e dominio
+- Error Boundary para falhas de renderizacao
+
+## Rotas
+
+- `/` catalogo
+- `/product/:id` detalhe do produto
+- `/cart` carrinho
+- `/login` login
+- `/register` cadastro
+
+## Variavel de ambiente
+
+Copie o arquivo de exemplo:
+
+```bash
+cp .env.sample .env
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Exemplo:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```env
+VITE_API_URL=http://localhost:8080
 ```
+
+## Scripts
+
+```bash
+npm run dev
+npm run build
+npm run lint
+npm run test
+npm run coverage
+```
+
+## Testes
+
+Arquivos de teste atuais:
+
+- `src/context/AuthContext.test.tsx`
+- `src/context/CartContext.test.tsx`
+- `src/pages/CatalogPage.test.tsx`
+- `src/pages/CartPage.test.tsx`
+
+## Estrutura de pastas
+
+```text
+web-app/src
+├── components/
+│   ├── cart/
+│   ├── layout/
+│   ├── product/
+│   └── ui/
+├── context/
+├── errors/
+├── hooks/
+├── pages/
+├── services/
+├── test/
+└── types/
+```
+
+## Placeholders de print
+
+Os placeholders de screenshots ficam em:
+
+- `../docs/screenshots/01-catalog.png`
+- `../docs/screenshots/02-product-detail.png`
+- `../docs/screenshots/03-cart.png`
+- `../docs/screenshots/04-login.png`
+- `../docs/screenshots/05-register.png`

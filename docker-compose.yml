@@ -1,22 +1,49 @@
-version: "3.8"
-
 services:
-
   mongodb:
     image: mongo:7
-    container_name: ecommerce-mongo
-
+    container_name: billify-mongo
     restart: always
-
     ports:
       - "27017:27017"
-
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
-
     volumes:
-      - ecommerce_mongo_data:/data/db
+      - billify_mongo_data:/data/db
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: billify-api
+    restart: always
+    depends_on:
+      - mongodb
+    environment:
+      PORT: 8080
+      JWT_SECRET: mysecret
+      JWT_EXPIRES_IN: 1h
+      BCRYPT_ROUNDS: 10
+      MONGO_URI: mongodb://root:root@mongodb:27017/ecommerce?authSource=admin
+      CATALOG_API_URL: https://dummyjson.com
+      CORS_ORIGINS: http://localhost:5173
+    ports:
+      - "3000:8080"
+    networks:
+      default:
+        aliases:
+          - ecommerce-api
+
+  web-app:
+    build:
+      context: ./web-app
+      dockerfile: Dockerfile
+    container_name: billify-web
+    restart: always
+    depends_on:
+      - api
+    ports:
+      - "5173:80"
 
 volumes:
-  ecommerce_mongo_data:
+  billify_mongo_data:
