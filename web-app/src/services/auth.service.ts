@@ -1,4 +1,5 @@
 import { api } from "@/services/api"
+import { localStorageService } from "./local-storage.service"
 
 type LoginPayload = {
     email: string
@@ -15,18 +16,18 @@ class AuthService {
 
         const { access_token } = response.data
 
-        localStorage.setItem("token", access_token)
+        localStorageService.token.set(access_token)
 
         return access_token
     }
 
     logout() {
-        localStorage.removeItem("token")
-        localStorage.removeItem("cart")
+        localStorageService.token.remove()
+        localStorageService.cart.remove()
     }
 
     getToken() {
-        return localStorage.getItem("token")
+        return localStorageService.token.get()
     }
 
     async register(data: { name: string; email: string; password: string }) {

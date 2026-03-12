@@ -1,62 +1,30 @@
 import { useEffect, useState } from "react"
 import type { ReactNode } from "react"
 
-import * as cartService from "@/services/cart.service"
-
 import type { CartItem } from "@/types/CartItem"
 import type { Product } from "@/types/Product"
 import { useAuth } from "@/hooks/useAuth"
 import { CartContext } from "./cart-context"
 import { toast } from "sonner"
+import { initializeCart } from "@/services/cart-initialization.service"
+import { createCartStrategy } from "@/services/cart-strategy.service"
 
 export function CartProvider({ children }: { children: ReactNode }) {
 
   const [items, setItems] = useState<CartItem[]>([])
   const { isAuthenticated } = useAuth()
-
-  function saveLocalCart(cart: CartItem[]) {
-    localStorage.setItem("cart", JSON.stringify(cart))
-  }
-
-  function loadLocalCart(): CartItem[] {
-    const local = JSON.parse(localStorage.getItem("cart") || "[]")
-    return Array.isArray(local) ? local : []
-  }
-
-  async function loadServerCart() {
-    const serverCart = await cartService.getCart()
-    setItems(serverCart)
-  }
-
-  async function syncLocalCart(localCart: CartItem[]) {
-
-    const serverCart = await cartService.syncCart(localCart)
-
-    setItems(serverCart)
-
-    localStorage.removeItem("cart")
-  }
+  const strategy = createCartStrategy(isAuthenticated)
 
   useEffect(() => {
-
-    const localCart = loadLocalCart()
-
-    if (!isAuthenticated) {
-      // Defer state update to the microtask queue to avoid ESLint set-state-in-effect warning
-      queueMicrotask(() => {
-        setItems(localCart)
-      })
-      return
-    }
-
-    if (localCart.length > 0) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      void syncLocalCart(localCart)
-      return
-    }
-
-    void loadServerCart()
-
+    void (async () => {
+      try {
+        const initialItems = await initializeCart(isAuthenticated)
+        setItems(initialItems)
+      } catch {
+        setItems([])
+        toast.error("Could not load cart. Try again.")
+      }
+    })()
   }, [isAuthenticated])
 
   async function addToCart(product: Product, quantity = 1) {
@@ -78,21 +46,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     setItems(updated)
 
-    if (!isAuthenticated) {
-      saveLocalCart(updated)
-      toast.success(
-        quantity > 1
-          ? `${quantity}x ${product.title} added to cart`
-          : `${product.title} added to cart`
-      )
-      return
-    }
-
     try {
-      await cartService.addCartItem({
-        productId: product.id,
-        quantity
-      })
+      await strategy.addItem(product.id, quantity, updated)
       toast.success(
         quantity > 1
           ? `${quantity}x ${product.title} added to cart`
@@ -115,13 +70,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     setItems(updated)
 
-    if (!isAuthenticated) {
-      saveLocalCart(updated)
-      return
-    }
-
     try {
-      await cartService.updateCartItem(productId, { quantity })
+      await strategy.updateItem(productId, quantity, updated)
     } catch {
       setItems(previous)
       toast.error("Could not update item quantity. Try again.")
@@ -136,16 +86,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     setItems(updated)
 
-    if (!isAuthenticated) {
-      saveLocalCart(updated)
-      if (itemToRemove) {
-        toast.success(`${itemToRemove.product.title} removed from cart`)
-      }
-      return
-    }
-
     try {
-      await cartService.removeCartItem(productId)
+      await strategy.removeItem(productId, updated)
       if (itemToRemove) {
         toast.success(`${itemToRemove.product.title} removed from cart`)
       }
@@ -166,14 +108,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     setItems([])
 
-    if (!isAuthenticated) {
-      localStorage.removeItem("cart")
-      toast.success("Cart cleared")
-      return
-    }
-
     try {
-      await cartService.clearCart()
+      await strategy.clear()
       toast.success("Cart cleared")
     } catch {
       setItems(previous)

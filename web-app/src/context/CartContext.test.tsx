@@ -107,6 +107,7 @@ describe('CartContext', () => {
   it('syncs local cart when authenticated and clears localStorage', async () => {
     mockedUseAuth.mockReturnValue({ isAuthenticated: true } as ReturnType<typeof useAuth>)
     localStorage.setItem('cart', JSON.stringify(cartWithProductA(1)))
+    vi.mocked(cartService.getCart).mockResolvedValue([])
     vi.mocked(cartService.syncCart).mockResolvedValue(cartWithProductA(4))
 
     renderCartProvider()
@@ -117,7 +118,21 @@ describe('CartContext', () => {
     })
 
     expect(localStorage.getItem('cart')).toBeNull()
-    expect(cartService.getCart).not.toHaveBeenCalled()
+    expect(cartService.getCart).toHaveBeenCalledTimes(1)
+  })
+
+  it('keeps server cart and does not sync local cart when server already has items', async () => {
+    mockedUseAuth.mockReturnValue({ isAuthenticated: true } as ReturnType<typeof useAuth>)
+    localStorage.setItem('cart', JSON.stringify(cartWithProductA(1)))
+    vi.mocked(cartService.getCart).mockResolvedValue(cartWithProductA(2))
+
+    renderCartProvider()
+
+    await waitFor(() => {
+      expect(screen.getByTestId('qty-a')).toHaveTextContent('2')
+    })
+
+    expect(cartService.syncCart).not.toHaveBeenCalled()
   })
 
   it('adds item as guest, merges quantity and persists in localStorage', async () => {
