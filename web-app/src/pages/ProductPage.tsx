@@ -7,6 +7,7 @@ import { Rating } from "@/components/ui/Rating"
 import ProductActions from "@/components/product/ProductActions"
 import type { ProductDetails } from "@/types/ProductDetails"
 import ProductGallery from "@/components/product/ProductGallery"
+import { Container } from "@/components/ui/Container"
 
 export default function ProductPage() {
     const { id } = useParams()
@@ -38,7 +39,7 @@ export default function ProductPage() {
     }
 
     return (
-        <div className="container mx-auto px-4 py-10">
+        <Container className="py-10">
 
             <div className="grid lg:grid-cols-2 gap-12">
 
@@ -100,6 +101,6 @@ export default function ProductPage() {
 
             </div>
 
-        </div>
+        </Container>
     )
 }

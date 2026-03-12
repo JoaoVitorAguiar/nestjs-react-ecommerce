@@ -7,7 +7,7 @@ export default function Layout() {
 
             <Navbar />
 
-            <main className="max-w-6xl mx-auto py-6">
+            <main className="layout-shell py-6">
                 <Outlet />
             </main>
 

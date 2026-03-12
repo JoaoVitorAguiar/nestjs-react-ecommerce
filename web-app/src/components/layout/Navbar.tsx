@@ -14,7 +14,7 @@ export function Navbar() {
 
     return (
         <header className="border-b border-white/10 bg-surface/60 backdrop-blur relative">
-            <div className="max-w-6xl mx-auto flex items-center justify-between py-4">
+            <div className="layout-shell flex items-center justify-between py-4">
 
                 <Logo />
 
@@ -39,9 +39,9 @@ export function Navbar() {
             {isMobileMenuOpen && (
                 <div
                     id="mobile-navigation"
-                    className="md:hidden border-t border-white/10 px-4 py-4"
+                    className="md:hidden border-t border-white/10"
                 >
-                    <div className="flex flex-col gap-4">
+                    <div className="layout-shell flex flex-col gap-4 py-4">
                         <NavLinks
                             className="flex-col gap-3"
                             onNavigate={closeMobileMenu}
