@@ -1,6 +1,6 @@
-# Screenshots placeholders
+# Screenshots
 
-Adicione os prints principais do FluxStore neste diretorio usando estes nomes:
+Arquivos de prints utilizados na documentacao:
 
 - `01-catalog.png`
 - `02-product-detail.png`

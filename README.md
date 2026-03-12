@@ -20,8 +20,9 @@ Documentacao principal de requisitos e visao geral do projeto.
 - [Tecnologias usadas](#tecnologias-usadas)
 - [Documentacao por modulo](#documentacao-por-modulo)
 - [Como executar](#como-executar)
+- [System design (arquitetura)](#system-design-arquitetura)
 - [Diagramas de sequencia](#diagramas-de-sequencia)
-- [Prints de tela (placeholders)](#prints-de-tela-placeholders)
+- [Prints de tela](#prints-de-tela)
 - [Estrutura de pastas (raiz)](#estrutura-de-pastas-raiz)
 
 ## Sobre o projeto
@@ -31,6 +32,14 @@ FluxStore e uma aplicacao fullstack de catalogo e carrinho de compras.
 - Catalogo: consumido de API externa (DummyJSON)
 - Carrinho: CRUD local por usuario autenticado (MongoDB)
 - Autenticacao: JWT
+
+## Observacoes
+
+- O MongoDB foi escolhido pela flexibilidade do modelo de dados e pela facilidade de usar o **MongoDB Atlas** em producao, mantendo a mesma abordagem adotada no desenvolvimento local.
+- A modelagem do carrinho no MongoDB usa **embedding** (itens embutidos no documento de carrinho), simplificando leitura e escrita por usuario.
+- A API de produtos (DummyJSON) foi escolhida porque eu ja tinha feito um ecommerce antes e gostei da logica de carrinho, que encaixa bem com uso de **Context API** no frontend.
+- A aplicacao foi publicada em uma instancia **EC2** com pipeline automatizado de **build e deploy**.
+- URL publica da aplicacao: [http://3.135.230.93/](http://3.135.230.93/)
 
 ## Requisitos funcionais
 
@@ -54,6 +63,7 @@ FluxStore e uma aplicacao fullstack de catalogo e carrinho de compras.
 - `RNF04`: validacao de entrada com DTOs e ValidationPipe
 - `RNF05`: cobertura de testes unitarios e integracao basica
 - `RNF06`: pipeline CI para lint, build e testes
+- `RNF07`: Deploy da aplicação de forma automática por meio de pipeline (CI/CD)
 
 ## Tecnologias usadas
 
@@ -123,6 +133,22 @@ cp .env.sample .env
 npm run dev
 ```
 
+## System design (arquitetura)
+
+```mermaid
+flowchart LR
+  U[Usuario / Browser] --> W[FluxStore Web<br/>React + TypeScript]
+  W -->|HTTP + JWT| A[FluxStore API<br/>NestJS]
+
+  A --> AU[AuthModule]
+  A --> CA[CatalogModule]
+  A --> CR[CartModule]
+
+  AU --> DB[(MongoDB)]
+  CR --> DB
+  CA --> EXT[DummyJSON API]
+```
+
 ## Diagramas de sequencia
 
 ### Fluxo 1: visitante preenche carrinho e sincroniza ao logar
@@ -167,15 +193,27 @@ sequenceDiagram
   F-->>U: Exibe catalogo e carrinho
 ```
 
-## Prints de tela (placeholders)
+## Prints de tela
 
-Substitua os placeholders abaixo pelos prints reais:
+### Catalogo
 
-- `docs/screenshots/01-catalog.png` - tela de catalogo
-- `docs/screenshots/02-product-detail.png` - tela de detalhe do produto
-- `docs/screenshots/03-cart.png` - tela de carrinho
-- `docs/screenshots/04-login.png` - tela de login
-- `docs/screenshots/05-register.png` - tela de cadastro
+![Catalogo](docs/screenshots/01-catalog.png)
+
+### Detalhe do produto
+
+![Detalhe do produto](docs/screenshots/02-product-detail.png)
+
+### Carrinho
+
+![Carrinho](docs/screenshots/03-cart.png)
+
+### Login
+
+![Login](docs/screenshots/04-login.png)
+
+### Cadastro
+
+![Cadastro](docs/screenshots/05-register.png)
 
 ## Estrutura de pastas (raiz)
 

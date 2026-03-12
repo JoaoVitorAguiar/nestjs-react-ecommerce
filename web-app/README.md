@@ -28,14 +28,14 @@ Frontend da aplicacao FluxStore, construido com React + TypeScript.
 ### `AuthContext`
 
 - guarda estado `isAuthenticated`
-- expone `login` e `logout`
+- expõe `login` e `logout`
 - persiste token no `localStorage`
 
 ### `ProductsContext`
 
 - centraliza pagina atual e dados do catalogo
 - usa TanStack Query para cache, retry e stale time
-- expone navegacao de paginas (`nextPage`, `previousPage`, `setPage`)
+- expõe navegacao de paginas (`nextPage`, `previousPage`, `setPage`)
 
 ### `CartContext`
 
@@ -113,12 +113,30 @@ web-app/src
 └── types/
 ```
 
-## Placeholders de print
-
-Os placeholders de screenshots ficam em:
+## Prints de tela
 
 - `../docs/screenshots/01-catalog.png`
 - `../docs/screenshots/02-product-detail.png`
 - `../docs/screenshots/03-cart.png`
 - `../docs/screenshots/04-login.png`
 - `../docs/screenshots/05-register.png`
+
+### Catalogo
+
+![Catalogo](../docs/screenshots/01-catalog.png)
+
+### Detalhe do produto
+
+![Detalhe do produto](../docs/screenshots/02-product-detail.png)
+
+### Carrinho
+
+![Carrinho](../docs/screenshots/03-cart.png)
+
+### Login
+
+![Login](../docs/screenshots/04-login.png)
+
+### Cadastro
+
+![Cadastro](../docs/screenshots/05-register.png)
