@@ -4,9 +4,15 @@ type Props = {
     quantity: number
     onIncrease: () => void
     onDecrease: () => void
+    disableIncrease?: boolean
 }
 
-export function QuantitySelector({ quantity, onIncrease, onDecrease }: Props) {
+export function QuantitySelector({
+    quantity,
+    onIncrease,
+    onDecrease,
+    disableIncrease = false
+}: Props) {
     return (
         <div className="flex items-center gap-2">
 
@@ -26,6 +32,7 @@ export function QuantitySelector({ quantity, onIncrease, onDecrease }: Props) {
                 variant="secondary"
                 onClick={onIncrease}
                 className="px-3 py-1"
+                disabled={disableIncrease}
             >
                 +
             </Button>

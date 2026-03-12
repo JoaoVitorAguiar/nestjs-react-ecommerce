@@ -1,11 +1,12 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/Button"
+import { toast } from "sonner"
 
-import type { Product } from "@/types/Product"
+import type { ProductDetails } from "@/types/ProductDetails"
 import { useCart } from "@/hooks/useCart"
 
 type Props = {
-    product: Product
+    product: ProductDetails
 }
 
 export default function ProductActions({ product }: Props) {
@@ -22,6 +23,10 @@ export default function ProductActions({ product }: Props) {
     }
 
     function handleAddToCart() {
+        if (quantity > product.stock) {
+            toast.error(`Only ${product.stock} units available in stock`)
+            return
+        }
         addToCart(product, quantity)
     }
 

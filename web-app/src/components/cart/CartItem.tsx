@@ -5,6 +5,7 @@ import { CartContext } from "@/context/cart-context"
 import { Card } from "@/components/ui/Card"
 import { Button } from "@/components/ui/Button"
 import { QuantitySelector } from "./QuantitySelector"
+import { toast } from "sonner"
 
 import type { CartItem as CartItemType } from "@/types/CartItem"
 
@@ -20,8 +21,15 @@ export function CartItem({ item, onRemove }: Props) {
     if (!cart) return null
 
     const { updateQuantity } = cart
+    const stockLimit = typeof item.product.stock === "number"
+        ? item.product.stock
+        : undefined
 
     function increase() {
+        if (stockLimit !== undefined && item.quantity >= stockLimit) {
+            toast.error(`Only ${stockLimit} units available in stock`)
+            return
+        }
         updateQuantity(item.product.id, item.quantity + 1)
     }
 
@@ -67,6 +75,7 @@ export function CartItem({ item, onRemove }: Props) {
                 quantity={item.quantity}
                 onIncrease={increase}
                 onDecrease={decrease}
+                disableIncrease={stockLimit !== undefined && item.quantity >= stockLimit}
             />
 
             <Button
